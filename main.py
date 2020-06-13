@@ -10,8 +10,9 @@ if __name__ == "__main__":
     except IndexError:
         raise SystemExit(f"Usage: {sys.argv[0]} <hex list file> <player name>") 
 
-    with open(source_file, mode='r+') as hex_source: 
+    with open(source_file, mode='r+') as hex_source, open(dest_file, mode='a') as player_list: 
         needed_hexes = hex_source.readlines()
+
         if len(needed_hexes) == 0:
             print("All hexes accounted for!")
             sys.exit(0)
@@ -19,6 +20,7 @@ if __name__ == "__main__":
         new_hex = random.choice(needed_hexes)
         needed_hexes.remove(new_hex)
         print(new_hex)
+        player_list.writelines(new_hex)
         hex_source.truncate(0)
         hex_source.writelines(needed_hexes)
 
