@@ -77,8 +77,6 @@ def generate_image(fg_color, bg_color):
     template.save("temp.png")
 
 
-
-
 if __name__ == "__main__":
 
     try:
