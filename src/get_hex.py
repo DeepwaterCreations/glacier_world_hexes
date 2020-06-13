@@ -8,6 +8,7 @@ from PIL import Image, ImageDraw
 
 HEX_FOLDER_NAME = "glacier_world_hexes"
 HEX_TEMPLATE_MASK_PATH = "img/hex_template.png"
+MAX_HEX_PER_PLAYER = 2
 
 def get_hex_filepath(player_name, hex_type, extension="png"):
     """player_name - the name of the player the hex is being generated for.
@@ -77,8 +78,23 @@ if __name__ == "__main__":
         raise SystemExit(f"Usage: {sys.argv[0]} <hex list file> <player name>") 
 
     with open(source_file, mode='r+', newline='') as hex_source: 
-        hex_assignments = csv.DictReader(hex_source)
-        new_hex = random.choice(list(hex_assignments))
+        hex_assignments = list(csv.DictReader(hex_source))
+        
+        #Check if the player has hit their quota
+        #TODO: Use the contents of the player folder, not the csv, since there
+        #   might be multiple csvs.
+        already_assigned = filter(lambda d: d["assigned"].strip() == player_name, hex_assignments)
+        if len(list(already_assigned)) >= MAX_HEX_PER_PLAYER:
+            print("You have enough for now, don't you think?")
+            sys.exit(0)
+
+        #Pick randomly from the unpicked rows
+        unassigned = filter(lambda d: d["assigned"].strip() == "", hex_assignments)
+        if len(list(unassigned)) == 0:
+            print("All the hexes are spoken for!")
+            sys.exit(0)
+        else:
+            new_hex = random.choice(list(unassigned))
 
     hex_type = new_hex["terrain"].strip().strip('\0')
     hex_template_filepath = get_hex_filepath(player_name, hex_type)
