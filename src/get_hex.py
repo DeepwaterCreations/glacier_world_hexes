@@ -2,6 +2,7 @@
 import random
 import sys
 import pathlib
+import csv
 
 from PIL import Image, ImageDraw
 
@@ -75,21 +76,16 @@ if __name__ == "__main__":
     except IndexError:
         raise SystemExit(f"Usage: {sys.argv[0]} <hex list file> <player name>") 
 
-    with open(source_file, mode='r+') as hex_source: 
-        needed_hexes = hex_source.readlines()
+    with open(source_file, mode='r+', newline='') as hex_source: 
+        hex_assignments = csv.DictReader(hex_source)
+        new_hex = random.choice(list(hex_assignments))
 
-        if len(needed_hexes) == 0:
-            print("All hexes accounted for!")
-            sys.exit(0)
-
-        new_hex = random.choice(needed_hexes)
-        needed_hexes.remove(new_hex)
-        hex_source.truncate(0)
-        hex_source.writelines(needed_hexes)
-
-
-    hex_type = new_hex.strip().strip('\0')
+    hex_type = new_hex["terrain"].strip().strip('\0')
     hex_template_filepath = get_hex_filepath(player_name, hex_type)
-    hex_template = generate_image((255,255,255), (128, 128, 255), savepath=hex_template_filepath)
+
+    fg_color = (int(new_hex['fg_r']), int(new_hex['fg_g']), int(new_hex['fg_b']))
+    bg_color = (int(new_hex['bg_r']), int(new_hex['bg_g']), int(new_hex['bg_b']))
+    hex_template = generate_image(fg_color, bg_color, savepath=hex_template_filepath)
+
     print("Generated {} for {}".format(hex_template_filepath, player_name))
 
