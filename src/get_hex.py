@@ -8,20 +8,17 @@ from PIL import Image, ImageDraw
 HEX_FOLDER_NAME = "glacier_world_hexes"
 HEX_TEMPLATE_MASK_PATH = "img/hex_template.png"
 
-def write_hex_template(player_name, hex_type):
+def get_hex_filepath(player_name, hex_type, extension="png"):
     """player_name - the name of the player the hex is being generated for.
-    Writes a blank hex with an appropriate filename to the player folder.
-    Returns the local filepath to the file.
+    hex_type - the name of the hex terrain.
+    Returns a filepath for saving the generated hex template
     """
-
-    #Generate the file path
     #It should go in a subdirectory of the user's home folder, in a sub-subdirectory
     #   named after the player the hex is being generated for
     folderpath = pathlib.Path.home() / HEX_FOLDER_NAME / player_name
     #Create the directories if they don't already exist
     folderpath.mkdir(parents=True, exist_ok=True)
 
-    extension = "png"
     number = 0
     filepath = None
     #Make sure our file path has a unique number by incrementing until we find one that doesn't exist
@@ -32,13 +29,6 @@ def write_hex_template(player_name, hex_type):
             .format(hex_type=hex_type, player_name=player_name, number=number, extension=extension)
         filepath = folderpath / filename
         number += 1
-
-    #Create the file
-    try:
-        filepath.touch(exist_ok=False) 
-    except ValueError:
-        print("Does {} exist? {}".format(str(filepath), filepath.exists()))
-        raise SystemExit("Couldn't create {}".format(filepath))
 
     return filepath.expanduser()
 
@@ -99,7 +89,7 @@ if __name__ == "__main__":
 
 
     hex_type = new_hex.strip().strip('\0')
-    hex_template_filepath = write_hex_template(player_name, hex_type)
+    hex_template_filepath = get_hex_filepath(player_name, hex_type)
     hex_template = generate_image((255,255,255), (128, 128, 255), savepath=hex_template_filepath)
     print("Generated {} for {}".format(hex_template_filepath, player_name))
 
