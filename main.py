@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 import random
-
-hex_source_file = "needed"
-hex_dest_files = ["gou", "iron", "elizibet"]
+import sys
 
 if __name__ == "__main__":
 
-    with open(hex_source_file, mode='r+') as hex_source:
+    try:
+        source_file = sys.argv[1]
+        dest_file = sys.argv[2]
+    except IndexError:
+        raise SystemExit(f"Usage: {sys.argv[0]} <hex list file> <player name>") 
+
+    with open(source_file, mode='r+') as hex_source: 
         needed_hexes = hex_source.readlines()
         if len(needed_hexes) == 0:
             print("All hexes accounted for!")
