@@ -26,7 +26,28 @@ async def on_message(message):
             subcommand = args[1]
 
         if subcommand in ["help", "--help", "-h", "h", "?"]:
-            print("Help requested")
+            help_message = """***HEXBOT***
+            Looking for something to do while we're waiting for players?
+            Or just kinda bored?
+            Why not contribute some hexes to the campaign map?
+
+            Ask, and Hexbot will deliver a hexagon template to your DMs
+            and request a particular type of terrain or map feature.
+
+            Doodle that terrain on the hexagon, using the template's 
+            suggested foreground and background colors to help 
+            keep things looking consistent (if you want), and send it back. 
+
+            I'll use your hex artwork to build the map! The more tile
+            variety we have, the prettier it'll look! Maybe!
+
+            Usage: 
+            `!hexbot help`: Display this message
+            `!hexbot get`: Get a new hex template
+            `!hexbot submit`: Use as a comment on your image, send the finished
+                image to me and hexbot will mark it off the list
+            """
+            await message.channel.send(help_message)
         elif subcommand in ["get", "--get", "-g", "g"]:
             print("User wants a hex")
         elif subcommand in ["submit", "--submit", "-s", "s"]:
