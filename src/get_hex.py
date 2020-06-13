@@ -3,6 +3,8 @@ import random
 import sys
 import pathlib
 
+HEX_FOLDER_NAME = "glacier_world_hexes"
+
 def write_hex_template(player_name, hex_type):
     """player_name - the name of the player the hex is being generated for.
     Writes a blank hex with an appropriate filename to the player folder.
@@ -12,7 +14,7 @@ def write_hex_template(player_name, hex_type):
     #Generate the file path
     #It should go in a subdirectory of the user's home folder, in a sub-subdirectory
     #   named after the player the hex is being generated for
-    folderpath = pathlib.Path.home() / "glacier_world_hexes" / player_name
+    folderpath = pathlib.Path.home() / HEX_FOLDER_NAME / player_name
     #Create the directories if they don't already exist
     folderpath.mkdir(parents=True, exist_ok=True)
 
