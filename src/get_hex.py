@@ -52,22 +52,28 @@ def generate_image(fg_color, bg_color):
 
     #Generate the base image 
     color_bands = [Image.new('L', template_mask.size, color=bg_color[color_idx]) for color_idx in range(3)]
-    template = Image.merge("RGB", color_bands)
+    background = Image.merge("RGB", color_bands)
 
     #Apply alpha mask
     alpha = template_mask.getchannel('A')
-    template.putalpha(alpha)
+    background.putalpha(alpha)
     
     #Draw the foreground color
-    draw = ImageDraw.Draw(template)
+    #We'll create it as a separate image and then blend,
+    #for the sake of being fancy.
+    foreground = Image.new('RGBA', template_mask.size, color=(0,0,0,0))
+    draw = ImageDraw.Draw(foreground)
 
-    def add_ellipse(color, r):
+    def add_ellipse(color, r, a):
         c_x = template_mask.width/2
         c_y = template_mask.height/2
-        draw.ellipse([(c_x - r, c_y - r),(c_x + r, c_y + r)], fill=fg_color)
+        draw.ellipse([(c_x - r, c_y - r),(c_x + r, c_y + r)], fill=(fg_color + tuple([a])))
 
-    add_ellipse(fg_color, 20)
-
+    add_ellipse(fg_color, 28, 64)
+    add_ellipse(fg_color, 24, 128)
+    add_ellipse(fg_color, 20, 255)
+    
+    template = Image.alpha_composite(background, foreground)
     template.save("temp.png")
 
 
@@ -90,12 +96,12 @@ if __name__ == "__main__":
 
         new_hex = random.choice(needed_hexes)
         needed_hexes.remove(new_hex)
-        hex_source.truncate(0)
-        hex_source.writelines(needed_hexes)
+        # hex_source.truncate(0)
+        # hex_source.writelines(needed_hexes)
 
 
     hex_type = new_hex.strip().strip('\0')
-    hex_template_filepath = write_hex_template(player_name, hex_type)
-    print("Generated {} for {}".format(hex_template_filepath, player_name))
     hex_template = generate_image((255,255,255), (128, 128, 255))
+    # hex_template_filepath = write_hex_template(player_name, hex_type)
+    # print("Generated {} for {}".format(hex_template_filepath, player_name))
 
