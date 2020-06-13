@@ -43,7 +43,7 @@ def write_hex_template(player_name, hex_type):
     return filepath.expanduser()
 
     
-def generate_image(fg_color, bg_color):
+def generate_image(fg_color, bg_color, savepath):
     """Creates a hexagon template image with two colors.
     fg_color - the color of a circle in the hex's center.
     bg_color - the color surrounding the circle.
@@ -74,7 +74,7 @@ def generate_image(fg_color, bg_color):
     add_ellipse(fg_color, 20, 255)
     
     template = Image.alpha_composite(background, foreground)
-    template.save("temp.png")
+    template.save(savepath)
 
 
 if __name__ == "__main__":
@@ -94,12 +94,12 @@ if __name__ == "__main__":
 
         new_hex = random.choice(needed_hexes)
         needed_hexes.remove(new_hex)
-        # hex_source.truncate(0)
-        # hex_source.writelines(needed_hexes)
+        hex_source.truncate(0)
+        hex_source.writelines(needed_hexes)
 
 
     hex_type = new_hex.strip().strip('\0')
-    hex_template = generate_image((255,255,255), (128, 128, 255))
-    # hex_template_filepath = write_hex_template(player_name, hex_type)
-    # print("Generated {} for {}".format(hex_template_filepath, player_name))
+    hex_template_filepath = write_hex_template(player_name, hex_type)
+    hex_template = generate_image((255,255,255), (128, 128, 255), savepath=hex_template_filepath)
+    print("Generated {} for {}".format(hex_template_filepath, player_name))
 
