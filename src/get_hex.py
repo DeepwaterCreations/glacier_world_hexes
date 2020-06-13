@@ -77,24 +77,36 @@ if __name__ == "__main__":
     except IndexError:
         raise SystemExit(f"Usage: {sys.argv[0]} <hex list file> <player name>") 
 
-    with open(source_file, mode='r+', newline='') as hex_source: 
-        hex_assignments = list(csv.DictReader(hex_source))
+    #Get hex list from file
+    with open(source_file, mode='r', encoding="utf-8", newline='') as hex_source: 
+        reader = csv.DictReader(hex_source, dialect="unix")
+        fieldnames = [name.strip().strip('\0') for name in reader.fieldnames]
+        hex_assignments = list(reader)
         
-        #Check if the player has hit their quota
-        #TODO: Use the contents of the player folder, not the csv, since there
-        #   might be multiple csvs.
-        already_assigned = filter(lambda d: d["assigned"].strip() == player_name, hex_assignments)
-        if len(list(already_assigned)) >= MAX_HEX_PER_PLAYER:
-            print("You have enough for now, don't you think?")
-            sys.exit(0)
+    #Check if the player has hit their quota
+    #TODO: Use the contents of the player folder, not the csv, since there
+    #   might be multiple csvs.
+    already_assigned = filter(lambda d: d["assigned"].strip() == player_name, hex_assignments)
+    if len(list(already_assigned)) >= MAX_HEX_PER_PLAYER:
+        print("You have enough for now, don't you think?")
+        sys.exit(0)
 
-        #Pick randomly from the unpicked rows
-        unassigned = filter(lambda d: d["assigned"].strip() == "", hex_assignments)
-        if len(list(unassigned)) == 0:
-            print("All the hexes are spoken for!")
-            sys.exit(0)
-        else:
-            new_hex = random.choice(list(unassigned))
+    #Pick randomly from the unpicked rows
+    unassigned = list(filter(lambda d: d["assigned"].strip() == "", hex_assignments))
+    if len(unassigned) == 0:
+        print("All the hexes are spoken for!")
+        sys.exit(0)
+    else:
+        new_hex = random.choice(unassigned)
+
+    #Assign the given hex to the player in the csv
+    new_hex["assigned"] = player_name
+
+    #Write new assignment back to the file
+    with open(source_file, mode='w', encoding="utf-8", newline='') as hex_source:
+        writer = csv.DictWriter(hex_source, fieldnames, dialect="unix")
+        writer.writeheader()
+        writer.writerows(hex_assignments)
 
     hex_type = new_hex["terrain"].strip().strip('\0')
     hex_template_filepath = get_hex_filepath(player_name, hex_type)
