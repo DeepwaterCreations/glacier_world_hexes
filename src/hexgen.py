@@ -7,6 +7,7 @@ import csv
 from PIL import Image, ImageDraw
 
 HEX_FOLDER_NAME = "glacier_world_hexes"
+HEX_SOURCE_FILE_NAME = "hex_list.csv"
 HEX_TEMPLATE_MASK_PATH = "img/hex_template.png"
 MAX_HEX_PER_PLAYER = 2
 
@@ -69,16 +70,14 @@ def generate_image(fg_color, bg_color, savepath):
     template.save(savepath)
 
 
-if __name__ == "__main__":
+def get_hex(player_name, hex_list_filepath=None):
+    if hex_list_filepath is None:
+        # hex_list_filepath = HEX_FOLDER_NAME + '/' + HEX_SOURCE_FILE_NAME
+        hex_list_filepath = pathlib.Path.home() / HEX_FOLDER_NAME / HEX_SOURCE_FILE_NAME
 
-    try:
-        source_file = sys.argv[1]
-        player_name = sys.argv[2]
-    except IndexError:
-        raise SystemExit(f"Usage: {sys.argv[0]} <hex list file> <player name>") 
 
     #Get hex list from file
-    with open(source_file, mode='r', encoding="utf-8", newline='') as hex_source: 
+    with open(hex_list_filepath, mode='r', encoding="utf-8", newline='') as hex_source: 
         reader = csv.DictReader(hex_source, dialect="unix")
         fieldnames = [name.strip().strip('\0') for name in reader.fieldnames]
         hex_assignments = list(reader)
@@ -103,7 +102,7 @@ if __name__ == "__main__":
     new_hex["assigned"] = player_name
 
     #Write new assignment back to the file
-    with open(source_file, mode='w', encoding="utf-8", newline='') as hex_source:
+    with open(hex_list_filepath, mode='w', encoding="utf-8", newline='') as hex_source:
         writer = csv.DictWriter(hex_source, fieldnames, dialect="unix")
         writer.writeheader()
         writer.writerows(hex_assignments)
@@ -117,3 +116,13 @@ if __name__ == "__main__":
 
     print("Generated {} for {}".format(hex_template_filepath, player_name))
 
+
+
+if __name__ == "__main__":
+    try:
+        hex_list_filepath = sys.argv[1]
+        player_name = sys.argv[2]
+    except IndexError:
+        raise SystemExit(f"Usage: {sys.argv[0]} <hex list file> <player name>") 
+
+    get_hex(player_name, hex_list_filepath)
