@@ -3,7 +3,10 @@ import random
 import sys
 import pathlib
 
+from PIL import Image, ImageDraw
+
 HEX_FOLDER_NAME = "glacier_world_hexes"
+HEX_TEMPLATE_MASK_PATH = "img/hex_template.png"
 
 def write_hex_template(player_name, hex_type):
     """player_name - the name of the player the hex is being generated for.
@@ -39,6 +42,37 @@ def write_hex_template(player_name, hex_type):
 
     return filepath.expanduser()
 
+    
+def generate_image(fg_color, bg_color):
+    """Creates a hexagon template image with two colors.
+    fg_color - the color of a circle in the hex's center.
+    bg_color - the color surrounding the circle.
+    """
+    template_mask = Image.open(HEX_TEMPLATE_MASK_PATH)
+
+    #Generate the base image 
+    color_bands = [Image.new('L', template_mask.size, color=bg_color[color_idx]) for color_idx in range(3)]
+    template = Image.merge("RGB", color_bands)
+
+    #Apply alpha mask
+    alpha = template_mask.getchannel('A')
+    template.putalpha(alpha)
+    
+    #Draw the foreground color
+    draw = ImageDraw.Draw(template)
+
+    def add_ellipse(color, r):
+        c_x = template_mask.width/2
+        c_y = template_mask.height/2
+        draw.ellipse([(c_x - r, c_y - r),(c_x + r, c_y + r)], fill=fg_color)
+
+    add_ellipse(fg_color, 20)
+
+    template.save("temp.png")
+
+
+
+
 if __name__ == "__main__":
 
     try:
@@ -63,4 +97,5 @@ if __name__ == "__main__":
     hex_type = new_hex.strip().strip('\0')
     hex_template_filepath = write_hex_template(player_name, hex_type)
     print("Generated {} for {}".format(hex_template_filepath, player_name))
+    hex_template = generate_image((255,255,255), (128, 128, 255))
 
