@@ -11,6 +11,10 @@ HEX_SOURCE_FILE_NAME = "hex_list.csv"
 HEX_TEMPLATE_MASK_PATH = "img/hex_template.png"
 MAX_HEX_PER_PLAYER = 2
 
+SUCCESS = 0
+NO_OPEN_HEXES = 1
+HIT_QUOTA = 2
+
 def get_hex_filepath(player_name, hex_type, extension="png"):
     """player_name - the name of the player the hex is being generated for.
     hex_type - the name of the hex terrain.
@@ -87,14 +91,12 @@ def get_hex(player_name, hex_list_filepath=None):
     #   might be multiple csvs.
     already_assigned = filter(lambda d: d["assigned"].strip() == player_name, hex_assignments)
     if len(list(already_assigned)) >= MAX_HEX_PER_PLAYER:
-        print("You have enough for now, don't you think?")
-        sys.exit(0)
+        return (HIT_QUOTA, "")
 
     #Pick randomly from the unpicked rows
     unassigned = list(filter(lambda d: d["assigned"].strip() == "", hex_assignments))
     if len(unassigned) == 0:
-        print("All the hexes are spoken for!")
-        sys.exit(0)
+        return (NO_OPEN_HEXES, "")
     else:
         new_hex = random.choice(unassigned)
 
@@ -116,6 +118,7 @@ def get_hex(player_name, hex_list_filepath=None):
 
     print("Generated {} for {}".format(hex_template_filepath, player_name))
 
+    return (SUCCESS, {"filepath":hex_template_filepath, "hex_type":hex_type})
 
 
 if __name__ == "__main__":

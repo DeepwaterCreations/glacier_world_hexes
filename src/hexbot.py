@@ -4,6 +4,8 @@ import os
 import discord
 from dotenv import load_dotenv
 
+from hexgen import get_hex, SUCCESS, NO_OPEN_HEXES, HIT_QUOTA
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -51,7 +53,37 @@ async def on_message(message):
             """
             await message.channel.send(help_message)
         elif subcommand in ["get", "--get", "-g", "g"]:
-            print("User wants a hex")
+            player = message.author
+
+            #Generate a hex
+            result = get_hex(player.name)
+            hex_file = None
+            hex_image = None
+            error_message = "Something weird happened. I dunno. Tell SeaWyrm you got `{}`"
+            if result[0] == SUCCESS:
+                details = result[1]
+                message = """
+                Here is your template. Foreground/background colors are just a 
+                suggestion. Use 'em if you wanna, or colors like them, or just do whatever.
+                Please draw a tile with this on it: 
+                ***{}***
+                When you're done, send it back with `!hex submit` using the same filename
+                and size, right here in your DMs."
+                """.format(details["hex_type"])
+                hex_file = details["filepath"]
+            elif result[0] == NO_OPEN_HEXES:
+                message = "Thanks, but we've got all the hexes we need at the moment."
+            elif result[0] == HIT_QUOTA:
+                message = "You want another hex? Finish what you've got first!"
+            else:
+                message = error_message.format(result)
+
+            #Send the message
+            await player.create_dm()
+            if hex_file is not None:
+                hex_image = discord.File(hex_file, filename=hex_file.name)
+            await player.dm_channel.send(message, file=hex_image)
+
         elif subcommand in ["submit", "--submit", "-s", "s"]:
             print("User wants to submit a hex")
         else:
