@@ -70,7 +70,7 @@ async def on_message(message):
                 Please draw a tile with this on it: 
                 ***{}***
                 When you're done, send it back with `!hex submit` using the same filename
-                and size, right here in your DMs."
+                and size, in the Discord server or right here in your DMs.
                 """.format(details["hex_type"])
                 hex_file = details["filepath"]
                 chat_message = "{} received a template for a {} tile. Check your DMs!".format(player, details["hex_type"])
