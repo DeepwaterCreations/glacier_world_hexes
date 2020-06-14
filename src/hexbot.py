@@ -37,6 +37,8 @@ async def on_message(message):
             Doodle that terrain on the hexagon, using the template's 
             suggested foreground and background colors to help 
             keep things looking consistent (if you want), and send it back. 
+            Once you've sent it back, you can request another. (Actually,
+            you can do two at a time.)
 
             I'll use your hex artwork to build the map! The more tile
             variety we have, the prettier it'll look! Maybe!
