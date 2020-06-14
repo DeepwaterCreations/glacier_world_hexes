@@ -59,10 +59,12 @@ async def on_message(message):
             result = get_hex(player.name)
             hex_file = None
             hex_image = None
+            dm_message = None
+            chat_message = None
             error_message = "Something weird happened. I dunno. Tell SeaWyrm you got `{}`"
             if result[0] == SUCCESS:
                 details = result[1]
-                message = """
+                dm_message = """
                 Here is your template. Foreground/background colors are just a 
                 suggestion. Use 'em if you wanna, or colors like them, or just do whatever.
                 Please draw a tile with this on it: 
@@ -71,23 +73,28 @@ async def on_message(message):
                 and size, right here in your DMs."
                 """.format(details["hex_type"])
                 hex_file = details["filepath"]
+                chat_message = "{} received a template for a {} tile. Check your DMs!".format(player, details["hex_type"])
             elif result[0] == NO_OPEN_HEXES:
-                message = "Thanks, but we've got all the hexes we need at the moment."
+                chat_message = "Thanks, but we've got all the hexes we need at the moment."
             elif result[0] == HIT_QUOTA:
-                message = "You want another hex? Finish what you've got first!"
+                chat_message = "You want another hex? Finish what you've got first!"
             else:
-                message = error_message.format(result)
+                dm_message = error_message.format(result)
 
-            #Send the message
-            await player.create_dm()
-            if hex_file is not None:
-                hex_image = discord.File(hex_file, filename=hex_file.name)
-            await player.dm_channel.send(message, file=hex_image)
-
+            #Send the messages
+            if dm_message is not None:
+                await player.create_dm()
+                if hex_file is not None:
+                    hex_image = discord.File(hex_file, filename=hex_file.name)
+                await player.dm_channel.send(dm_message, file=hex_image)
+            if chat_message is not None:
+                await message.channel.send(chat_message)
         elif subcommand in ["submit", "--submit", "-s", "s"]:
             print("User wants to submit a hex")
         else:
             print("I dunno what {} is.".format(subcommand))
 
+# @client.event
+# async def 
 
 client.run(TOKEN)
