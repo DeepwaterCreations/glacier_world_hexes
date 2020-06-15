@@ -5,10 +5,12 @@ import inspect
 import discord
 from dotenv import load_dotenv
 
+import hexget
 from hexgen import get_hex, SUCCESS, NO_OPEN_HEXES, HIT_QUOTA
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+HOST_DISCORD_ID = os.getenv('HOST_DISCORD_ID')
 
 client = discord.Client()
 
@@ -90,9 +92,25 @@ async def on_message(message):
             if chat_message is not None:
                 await message.channel.send(inspect.cleandoc(chat_message))
         elif subcommand in ["submit", "--submit", "-s", "s"]:
-            print("User wants to submit a hex")
-        else:
+            chat_message = None
+            #Check if there's a file
+            if len(message.attachments) < 1:
+                chat_message = "You have to attach the file to the `!hexbot submit` message, or I won't see it."
+            else:
+                chat_message = "Got it. Sweet!"
 
+            for attachment in message.attachments:
+                result = hexget.mark_completed(attachment.filename, message.author.name)
+                if result[0]:
+                    image = await attachment.to_file()
+                    host = client.get_user(int(HOST_DISCORD_ID))
+                    await host.send("Tile from {}".format(message.author.name), file=image)
+                else:
+                    chat_message = result[1]
+
+            if chat_message is not None:
+                await message.channel.send(inspect.cleandoc(chat_message))
+        else:
             print("I dunno what {} is. Do `!hexbot help` to see the actual commands".format(subcommand))
 
 client.run(TOKEN)
