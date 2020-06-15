@@ -94,7 +94,5 @@ async def on_message(message):
         else:
             print("I dunno what {} is.".format(subcommand))
 
-# @client.event
-# async def 
 
 client.run(TOKEN)
