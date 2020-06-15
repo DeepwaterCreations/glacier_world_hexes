@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import inspect
 
 import discord
 from dotenv import load_dotenv
@@ -51,7 +52,7 @@ async def on_message(message):
             `!hexbot submit`: Use as a comment on your image, send the finished
                 image to me and hexbot will mark it off the list
             """
-            await message.channel.send(help_message)
+            await message.channel.send(inspect.cleandoc(help_message))
         elif subcommand in ["get", "--get", "-g", "g"]:
             player = message.author
 
@@ -83,12 +84,11 @@ async def on_message(message):
 
             #Send the messages
             if dm_message is not None:
-                await player.create_dm()
                 if hex_file is not None:
                     hex_image = discord.File(hex_file, filename=hex_file.name)
-                await player.dm_channel.send(dm_message, file=hex_image)
+                await player.send(inspect.cleandoc(dm_message), file=hex_image)
             if chat_message is not None:
-                await message.channel.send(chat_message)
+                await message.channel.send(inspect.cleandoc(chat_message))
         elif subcommand in ["submit", "--submit", "-s", "s"]:
             print("User wants to submit a hex")
         else:
