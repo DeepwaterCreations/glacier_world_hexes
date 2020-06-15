@@ -92,7 +92,7 @@ async def on_message(message):
         elif subcommand in ["submit", "--submit", "-s", "s"]:
             print("User wants to submit a hex")
         else:
-            print("I dunno what {} is.".format(subcommand))
 
+            print("I dunno what {} is. Do `!hexbot help` to see the actual commands".format(subcommand))
 
 client.run(TOKEN)
