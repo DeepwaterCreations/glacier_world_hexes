@@ -88,8 +88,8 @@ def get_hex(player_name, hex_list_filepath=None):
     #Check if the player has hit their quota
     #TODO: Use the contents of the player folder, not the csv, since there
     #   might be multiple csvs.
-    already_assigned = filter(lambda d: d["assigned"].strip() == player_name, hex_assignments)
-    if len(list(already_assigned)) >= MAX_HEX_PER_PLAYER:
+    in_progress_by_player = filter(lambda d: d["assigned"].strip() == player_name and d["completed"] == "False", hex_assignments)
+    if len(list(in_progress_by_player)) >= MAX_HEX_PER_PLAYER:
         return (HIT_QUOTA, "")
 
     #Pick randomly from the unpicked rows
