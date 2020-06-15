@@ -99,21 +99,22 @@ def get_hex(player_name, hex_list_filepath=None):
     else:
         new_hex = random.choice(unassigned)
 
+    #Generate the hex
+    hex_type = new_hex["terrain"].strip().strip('\0')
+    fg_color = (int(new_hex['fg_r']), int(new_hex['fg_g']), int(new_hex['fg_b']))
+    bg_color = (int(new_hex['bg_r']), int(new_hex['bg_g']), int(new_hex['bg_b']))
+    hex_template_filepath = get_hex_filepath(player_name, hex_type)
+    hex_template = generate_image(fg_color, bg_color, savepath=hex_template_filepath)
+
     #Assign the given hex to the player in the csv
     new_hex["assigned"] = player_name
+    new_hex["filename"] = hex_template_filepath.name
 
     #Write new assignment back to the file
     with open(hex_list_filepath, mode='w', encoding="utf-8", newline='') as hex_source:
         writer = csv.DictWriter(hex_source, fieldnames, dialect="unix")
         writer.writeheader()
         writer.writerows(hex_assignments)
-
-    hex_type = new_hex["terrain"].strip().strip('\0')
-    hex_template_filepath = get_hex_filepath(player_name, hex_type)
-
-    fg_color = (int(new_hex['fg_r']), int(new_hex['fg_g']), int(new_hex['fg_b']))
-    bg_color = (int(new_hex['bg_r']), int(new_hex['bg_g']), int(new_hex['bg_b']))
-    hex_template = generate_image(fg_color, bg_color, savepath=hex_template_filepath)
 
     print("Generated {} for {}".format(hex_template_filepath, player_name))
 
