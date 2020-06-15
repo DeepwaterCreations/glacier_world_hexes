@@ -76,7 +76,6 @@ def generate_image(fg_color, bg_color, savepath):
 
 def get_hex(player_name, hex_list_filepath=None):
     if hex_list_filepath is None:
-        # hex_list_filepath = HEX_FOLDER_NAME + '/' + HEX_SOURCE_FILE_NAME
         hex_list_filepath = pathlib.Path.home() / HEX_FOLDER_NAME / HEX_SOURCE_FILE_NAME
 
 
